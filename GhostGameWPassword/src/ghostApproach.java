@@ -2,6 +2,7 @@
 //edited by mich
 import java.awt.*;
 import java.awt.event.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;  // Correct Random import
 import javax.swing.*;
@@ -74,6 +75,9 @@ public class ghostApproach extends JPanel implements ActionListener, KeyListener
     private JButton loginButton;
     private JLabel passwordLabel, titleLabel;
     private boolean isAuthenticated = false;
+    private static final String CORRECT_HASH = "ead6ef03d61ee60c533d6d450c50a1e559a8a37f6b796a4094cd0dac6b744428";
+    // ^^^ this is the hashed password 
+
 
     //canvas and background
     ghostApproach() {
@@ -107,19 +111,27 @@ public class ghostApproach extends JPanel implements ActionListener, KeyListener
         add(loginButton);
         
 
-        // Action listener for login button
+        // action listenerrrr
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String enteredPassword = new String(passwordField.getPassword());
 
-                if (enteredPassword.equals("fart")) {  // the password
-                    isAuthenticated = true;
-                    removePasswordComponents();
-                    titleLabel.setVisible(false);
-                    startGame();  // Start the game logic
-                } else {
-                    JOptionPane.showMessageDialog(null, "Incorrect Password!");
+                try {
+                    // this hashes the password entered
+                    String enteredHash = PasswordHasher.hashPassword(enteredPassword);
+
+                    // this compares the hashed password to the stored hashed password
+                    if (enteredHash.equals(CORRECT_HASH)) {
+                        isAuthenticated = true;
+                        removePasswordComponents();
+                        titleLabel.setVisible(false);
+                        startGame();  // Start the game logic
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Incorrect Password!");
+                    }
+                } catch (NoSuchAlgorithmException ex) {
+                    JOptionPane.showMessageDialog(null, "Error hashing the password: " + ex.getMessage());
                 }
             }
         });
